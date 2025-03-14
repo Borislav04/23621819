@@ -1,28 +1,28 @@
 public class Main {
     public static void main(String[] args) {
-        Student[] students = new Student[100];
-        int studentCount = 0;
+        Student student1 = new Student("Иван Иванов", 12345, 1, "Информатика", "Група A");
+        Student student2 = new Student("Мария Петрова", 67890, 1, "Математика", "Група B");
 
-        students[studentCount] = new Student("Иван Иванов", 12345, 1, "Информатика", "Група A");
-        studentCount++;
-        System.out.println("Студентът Иван Иванов е записан успешно.");
+        Course course1 = new Course("Програмиране", "задължителна", 1);
+        Course course2 = new Course("Математика", "задължителна", 1);
 
-        students[studentCount] = new Student("Мария Петрова", 67890, 1, "Математика", "Група B");
-        studentCount++;
-        System.out.println("Студентката Мария Петрова е записана успешно.");
+        student1.addCourse(course1);
+        student2.addCourse(course2);
 
-        int searchFacultyNumber = 12345;
-        boolean found = false;
-        for (int i = 0; i < studentCount; i++) {
-            if (students[i].facultyNumber == searchFacultyNumber) {
-                System.out.println("Намерен студент: " + students[i].name);
-                found = true;
-                break;
-            }
+        System.out.println("Информация за студентите:");
+        printStudentInfo(student1);
+        printStudentInfo(student2);
+    }
+
+    public static void printStudentInfo(Student student) {
+        System.out.println("Студент: " + student.name);
+        System.out.println("Факултетен номер: " + student.facultyNumber);
+        System.out.println("Специалност: " + student.program);
+        System.out.println("Група: " + student.group);
+        System.out.println("Дисциплини:");
+        for (Course course : student.courses) {
+            System.out.println("  - " + course.name + " (" + course.type + ", курс " + course.year + ")");
         }
-
-        if (!found) {
-            System.out.println("Студент с факултетен номер " + searchFacultyNumber + " не е намерен.");
-        }
+        System.out.println();
     }
 }
