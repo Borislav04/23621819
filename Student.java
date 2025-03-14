@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Student {
     public String name;
     public int facultyNumber;
@@ -5,6 +8,7 @@ public class Student {
     public String program;
     public String group;
     public String status;
+    public List<Course> courses;
 
     public Student(String name, int facultyNumber, int year, String program, String group) {
         this.name = name;
@@ -13,5 +17,11 @@ public class Student {
         this.program = program;
         this.group = group;
         this.status = "записан";
+        this.courses = new ArrayList<>();
+    }
+
+    public void addCourse(Course course) {
+        this.courses.add(course);
+        System.out.println("Дисциплината " + course.name + " е добавена за студент " + this.name);
     }
 }
