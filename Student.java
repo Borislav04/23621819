@@ -22,6 +22,5 @@ public class Student {
 
     public void addCourse(Course course) {
         this.courses.add(course);
-        System.out.println("Дисциплината " + course.name + " е добавена за студент " + this.name);
     }
 }
