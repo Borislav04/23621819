@@ -24,12 +24,12 @@ public class University {
     }
 
     public void enrollInCourse(int facultyNumber, Course course) {
-        Student student = findStudentByFacultyNumber(facultyNumber);
-        if (student != null) {
-            student.addCourse(course);
-            System.out.println("Дисциплината " + course.name + " е записана за студент " + student.name);
-        } else {
-            System.out.println("Студент с факултетен номер " + facultyNumber + " не е намерен.");
-        }
+    Student student = findStudentByFacultyNumber(facultyNumber);
+    if (student != null) {
+        student.addCourse(course);
+        System.out.println("Дисциплината " + course.name + " е записана за студент " + student.name);
+    } else {
+        System.out.println("Студент с факултетен номер " + facultyNumber + " не е намерен.");
     }
+}
 }
