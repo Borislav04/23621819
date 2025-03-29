@@ -11,11 +11,11 @@ public class Main {
         university.enrollInCourse(12345, course1);
         university.enrollInCourse(67890, course2);
 
-        Student student = university.findStudentByFacultyNumber(12345);
-        if (student != null) {
-            System.out.println("Намерен студент: " + student.name);
-        } else {
-            System.out.println("Студентът не е намерен.");
-        }
+        university.addGrade(12345, "Програмиране", 5.5);
+        university.addGrade(67890, "Математика", 6.0);
+
+        university.changeStudentData(12345, "курс", "2");
+
+        university.printStudentReport(12345);
     }
 }
