@@ -6,8 +6,11 @@ public class Main {
         String fileName = "student_data.dat";
 
         addTestData(university);
+        displayAverageGrades(university);
+
         saveUniversityData(university, fileName);
         University loadedUniversity = loadUniversityData(fileName);
+
         if (loadedUniversity != null) {
             displayUniversityData(loadedUniversity);
         }
@@ -27,6 +30,16 @@ public class Main {
         university.addGrade(67890, "Дискретна Математика", 6.0);
 
         university.changeStudentData(12345, "курс", "2");
+    }
+    private static void displayAverageGrades(University university) {
+        System.out.println("\n=== Среден успех на студенти ===");
+        for (Student student : university.getStudents()) {
+            double average = student.calculateAverageGrade();
+            System.out.printf("%s (ФН: %d): %.2f%n",
+                    student.getName(),
+                    student.getFacultyNumber(),
+                    average);
+        }
     }
 
     private static void saveUniversityData(University university, String fileName) {
