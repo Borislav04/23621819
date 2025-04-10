@@ -1,7 +1,10 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class University {
+public class University implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private List<Student> students;
 
     public University() {
@@ -88,5 +91,8 @@ public class University {
         } else {
             System.out.println("Студент с факултетен номер " + facultyNumber + " не е намерен.");
         }
+    }
+    public List<Student> getStudents() {
+        return students;
     }
 }
