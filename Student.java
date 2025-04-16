@@ -1,44 +1,72 @@
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Student implements Serializable {
-    private static final long serialVersionUID = 1L;
+    public enum StudentStatus {
+        ACTIVE, INTERRUPTED, GRADUATED
+    }
 
-    public String name;
-    public int facultyNumber;
-    public int year;
-    public String program;
-    public String group;
-    public String status;
-    public List<Course> courses;
+    private String name;
+    private String facultyNumber;
+    private String program;
+    private String group;
+    private int year;
+    private StudentStatus status;
+    private Map<Course, Double> grades;
 
-    public Student(String name, int facultyNumber, int year, String program, String group) {
+    public Student(String name, String facultyNumber, String program, String group) {
         this.name = name;
         this.facultyNumber = facultyNumber;
-        this.year = year;
         this.program = program;
         this.group = group;
-        this.status = "записан";
-        this.courses = new ArrayList<>();
+        this.year = 1;
+        this.status = StudentStatus.ACTIVE;
+        this.grades = new HashMap<>();
     }
 
-    public void addCourse(Course course) {
-        this.courses.add(course);
-    }
-    public double calculateAverageGrade() {
-        if (courses.isEmpty()) return 0.0;
-        double sum = 0.0;
-        int count = 0;
-        for (Course course : courses) {
-            if (course.getGrade() > 0) {
-                sum += course.getGrade();
-                count++;
-            }
+    public void interrupt() {
+        if (this.status != StudentStatus.GRADUATED) {
+            this.status = StudentStatus.INTERRUPTED;
         }
-        return count > 0 ? sum / count : 0.0;
     }
-    public String getName() { return this.name; }
-    public int getFacultyNumber() { return this.facultyNumber; }
-    public List<Course> getCourses() { return this.courses; }
+
+    public void resume() {
+        if (this.status == StudentStatus.INTERRUPTED) {
+            this.status = StudentStatus.ACTIVE;
+        }
+    }
+
+    public void graduate() {
+        this.status = StudentStatus.GRADUATED;
+    }
+
+    public void addGrade(Course course, double grade) {
+        if (status == StudentStatus.ACTIVE) {
+            grades.put(course, grade);
+        }
+    }
+
+    public double calculateAverageGrade() {
+        if (grades.isEmpty()) return 0.0;
+
+        double sum = grades.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .sum();
+        return sum / grades.size();
+    }
+
+    public String getFacultyNumber() {
+        return facultyNumber;
+    }
+
+    public StudentStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Студент: %s (%s), %s, %s, %d курс, Статус: %s, Среден успех: %.2f",
+                name, facultyNumber, program, group, year, status, calculateAverageGrade());
+    }
 }
