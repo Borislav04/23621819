@@ -1,31 +1,29 @@
 import java.io.*;
 
 public class FileManager {
+    private static final String DATA_FILE = "university.dat";
 
-    public static void saveUniversityToFile(String fileName, University university) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
-            out.writeObject(university);
-            System.out.println("Данните са запазени успешно във файл: " + fileName);
+    public void save(University university) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(DATA_FILE))) {
+            oos.writeObject(university);
         } catch (IOException e) {
-            System.err.println("Грешка при запис: " + e.getMessage());
+            System.err.println("Грешка при запазване на данните: " + e.getMessage());
         }
     }
 
-    public static University loadUniversityFromFile(String fileName) {
-        File file = new File(fileName);
-
+    public University load() {
+        File file = new File(DATA_FILE);
         if (!file.exists()) {
-            System.out.println("Файлът не съществува. Създава се нов университет.");
             return new University();
         }
 
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
-            University university = (University) in.readObject();
-            System.out.println("Данните са заредени успешно от файл: " + fileName);
-            return university;
+        try (ObjectInputStream ois = new ObjectInputStream(
+                new FileInputStream(DATA_FILE))) {
+            return (University) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Грешка при зареждане на файл: " + e.getMessage());
-            return null;
+            System.err.println("Грешка при зареждане на данните: " + e.getMessage());
+            return new University();
         }
     }
 }
