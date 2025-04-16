@@ -1,70 +1,71 @@
-import java.io.IOException;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         University university = new University();
-        String fileName = "student_data.dat";
+        FileManager fileManager = new FileManager();
 
-        addTestData(university);
-        displayAverageGrades(university);
-
-        saveUniversityData(university, fileName);
-        University loadedUniversity = loadUniversityData(fileName);
-
+        University loadedUniversity = fileManager.load();
         if (loadedUniversity != null) {
-            displayUniversityData(loadedUniversity);
+            university = loadedUniversity;
+        }
+        university.setFileManager(fileManager);
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Информационна система за студенти");
+        System.out.println("Достъпни команди: enroll, print, interrupt, resume, exit");
+
+        while (true) {
+            System.out.print("> ");
+            String commandLine = scanner.nextLine();
+            String[] parts = commandLine.split(" ", 2);
+            String command = parts[0].toLowerCase();
+
+            try {
+                switch (command) {
+                    case "enroll":
+                        handleEnrollCommand(parts[1], university);
+                        break;
+                    case "print":
+                        handlePrintCommand(parts[1], university);
+                        break;
+                    case "interrupt":
+                        university.interruptStudent(parts[1]);
+                        System.out.println("Статусът на студента е променен на 'Прекъснал'");
+                        break;
+                    case "exit":
+                        System.out.println("Затваряне на системата...");
+                        return;
+                    default:
+                        System.out.println("Неизвестна команда");
+                }
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("Грешен формат на командата");
+            }
         }
     }
 
-    private static void addTestData(University university) {
-        university.enrollStudent("Иван Иванов", 12345, "Информатика", "Група A");
-        university.enrollStudent("Мария Петрова", 67890, "Математика", "Група B");
-
-        Course programming = new Course("Програмиране", "задължителна", 1);
-        Course math = new Course("Дискретна Математика", "задължителна", 1);
-
-        university.enrollInCourse(12345, programming);
-        university.enrollInCourse(67890, math);
-
-        university.addGrade(12345, "Програмиране", 5.5);
-        university.addGrade(67890, "Дискретна Математика", 6.0);
-
-        university.changeStudentData(12345, "курс", "2");
-    }
-    private static void displayAverageGrades(University university) {
-        System.out.println("\n=== Среден успех на студенти ===");
-        for (Student student : university.getStudents()) {
-            double average = student.calculateAverageGrade();
-            System.out.printf("%s (ФН: %d): %.2f%n",
-                    student.getName(),
-                    student.getFacultyNumber(),
-                    average);
+    private static void handleEnrollCommand(String args, University university) {
+        String[] enrollArgs = args.split(" ");
+        if (enrollArgs.length < 4) {
+            System.out.println("Грешен формат. Използвайте: enroll <fn> <program> <group> <name>");
+            return;
         }
+
+        String facultyNumber = enrollArgs[0];
+        String program = enrollArgs[1];
+        String group = enrollArgs[2];
+        String name = enrollArgs[3];
+
+        Student student = new Student(name, facultyNumber, program, group);
+        university.enrollStudent(student);
+        System.out.println("Студентът е записан успешно!");
     }
 
-    private static void saveUniversityData(University university, String fileName) {
-        try {
-            FileManager.saveUniversityToFile(fileName, university);
-        } catch (Exception e) {
-            System.err.println("Грешка при запис: " + e.getMessage());
-        }
-    }
-
-    private static University loadUniversityData(String fileName) {
-        try {
-            return FileManager.loadUniversityFromFile(fileName);
-        } catch (Exception e) {
-            System.err.println("Грешка при зареждане: " + e.getMessage());
-            return null;
-        }
-    }
-
-    private static void displayUniversityData(University university) {
-        System.out.println("\n=== Студентски справки ===");
-        university.printStudentReport(12345);
-        university.printStudentReport(67890);
-
-        System.out.println("\n=== Статистика ===");
-        System.out.println("Общ брой студенти: " + university.getStudents().size());
+    private static void handlePrintCommand(String facultyNumber, University university) {
+        university.getStudent(facultyNumber).ifPresentOrElse(
+                System.out::println,
+                () -> System.out.println("Студент с факултетен номер " + facultyNumber + " не е намерен")
+        );
     }
 }
