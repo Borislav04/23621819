@@ -1,25 +1,39 @@
 import java.io.Serializable;
 
 public class Course implements Serializable {
-    private static final long serialVersionUID = 1L;
+    public enum CourseType {
+        MANDATORY, ELECTIVE
+    }
 
-    public String name;
-    public String type;
-    public int year;
-    public double grade;
+    private String name;
+    private CourseType type;
+    private int credits; // Само за избираеми дисциплини
 
-    public Course(String name, String type, int year) {
+    public Course(String name, CourseType type) {
+        this(name, type, type == CourseType.ELECTIVE ? 3 : 0);
+    }
+
+    public Course(String name, CourseType type, int credits) {
         this.name = name;
         this.type = type;
-        this.year = year;
-        this.grade = 0.0;
+        this.credits = type == CourseType.ELECTIVE ? credits : 0;
     }
 
-    public double getGrade() {
-        return grade;
+    // Getters
+    public String getName() {
+        return name;
     }
 
-    public void setGrade(double grade) {
-        this.grade = grade;
+    public CourseType getType() {
+        return type;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s)", name, type);
     }
 }
