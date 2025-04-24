@@ -1,72 +1,92 @@
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Student implements Serializable {
-    public enum StudentStatus {
-        ACTIVE, INTERRUPTED, GRADUATED
-    }
+    private static final long serialVersionUID = 1L;
 
     private String name;
-    private String facultyNumber;
+    private int facultyNumber;
     private String program;
     private String group;
     private int year;
-    private StudentStatus status;
-    private Map<Course, Double> grades;
+    private Status status;
+    private Map<String, Double> grades;
+    private Set<String> enrolledCourses;
 
-    public Student(String name, String facultyNumber, String program, String group) {
+    public enum Status {
+        ACTIVE, INTERRUPTED, GRADUATED
+    }
+
+    public Student(String name, int facultyNumber, String program, String group) {
         this.name = name;
         this.facultyNumber = facultyNumber;
         this.program = program;
         this.group = group;
         this.year = 1;
-        this.status = StudentStatus.ACTIVE;
+        this.status = Status.ACTIVE;
         this.grades = new HashMap<>();
+        this.enrolledCourses = new HashSet<>();
     }
 
-    public void interrupt() {
-        if (this.status != StudentStatus.GRADUATED) {
-            this.status = StudentStatus.INTERRUPTED;
-        }
+    public String getName() {
+        return name;
     }
 
-    public void resume() {
-        if (this.status == StudentStatus.INTERRUPTED) {
-            this.status = StudentStatus.ACTIVE;
-        }
-    }
-
-    public void graduate() {
-        this.status = StudentStatus.GRADUATED;
-    }
-
-    public void addGrade(Course course, double grade) {
-        if (status == StudentStatus.ACTIVE) {
-            grades.put(course, grade);
-        }
-    }
-
-    public double calculateAverageGrade() {
-        if (grades.isEmpty()) return 0.0;
-
-        double sum = grades.values().stream()
-                .mapToDouble(Double::doubleValue)
-                .sum();
-        return sum / grades.size();
-    }
-
-    public String getFacultyNumber() {
+    public int getFacultyNumber() {
         return facultyNumber;
     }
 
-    public StudentStatus getStatus() {
+    public String getProgram() {
+        return program;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public Status getStatus() {
         return status;
+    }
+
+    public Map<String, Double> getGrades() {
+        return grades;
+    }
+
+    public Set<String> getEnrolledCourses() {
+        return enrolledCourses;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void enrollInCourse(String course) {
+        enrolledCourses.add(course);
+    }
+
+    public void addGrade(String course, double grade) {
+        grades.put(course, grade);
+    }
+
+    public boolean isEnrolledIn(String course) {
+        return enrolledCourses.contains(course);
     }
 
     @Override
     public String toString() {
-        return String.format("Студент: %s (%s), %s, %s, %d курс, Статус: %s, Среден успех: %.2f",
-                name, facultyNumber, program, group, year, status, calculateAverageGrade());
+        return facultyNumber + " - " + name + ", програма: " + program + ", група: " + group +
+                ", курс: " + year + ", статус: " + status;
     }
 }
