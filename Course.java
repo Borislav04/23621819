@@ -1,11 +1,9 @@
 import java.io.Serializable;
 
 public class Course implements Serializable {
-    private static final long serialVersionUID = 1L;
-
 
     private String name;
-    private String type;
+    private String type; // "задължителна" или "избираема"
     private int year;
     private int credits;
     private double grade;
@@ -21,34 +19,13 @@ public class Course implements Serializable {
         this.credits = credits;
         this.grade = 0.0;
     }
-    public Course(Course other) {
-        this.name = other.name;
-        this.type = other.type;
-        this.year = other.year;
-        this.credits = other.credits;
-        this.grade = other.grade;
-    }
 
     public String getName() {
-        return name; 
-    }
-    public String getType() {
-        return type; 
-    }
-    public int getYear() {
-        return year; 
-    }
-    public int getCredits() {
-        return credits;
-    }
-    public double getGrade() {
-        return grade;
+        return name;
     }
 
-    public void setGrade(double grade) {
-        if (grade >= 2.0 && grade <= 6.0) {
-            this.grade = grade;
-        }
+    public String getType() {
+        return type;
     }
 
     @Override
