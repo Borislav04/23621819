@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        University university = new University();
+        University university;
         FileManager fileManager = new FileManager();
 
         university = fileManager.loadUniversity();
@@ -61,6 +61,9 @@ public class Main {
                     case "export":
                         handleExport(tokens, university, fileManager);
                         break;
+                    case "courses":
+                        handleCourses(tokens, university);
+                        break;
                     case "help":
                         printHelp();
                         break;
@@ -75,6 +78,15 @@ public class Main {
                 System.out.println("Грешка: " + e.getMessage());
             }
         }
+    }
+
+    private static void handleCourses(String[] parts, University university) {
+        if (parts.length < 2) {
+            System.out.println("Използване: courses <специалност>");
+            return;
+        }
+        String program = parts[1];
+        university.printAllCourses(program);
     }
 
     private static void handleEnroll(String[] parts, University university) {
@@ -228,6 +240,7 @@ public class Main {
         System.out.println("protocol <дисциплина> - Генерира протокол за дисциплина");
         System.out.println("report <фн> - Академична справка");
         System.out.println("export [файл] - Експортира данни в текстов файл");
+        System.out.println("courses <специалност> - Показва всички дисциплини по специалността");
         System.out.println("help - Показва този помощен текст");
         System.out.println("exit - Запазва и излиза от системата\n");
     }
