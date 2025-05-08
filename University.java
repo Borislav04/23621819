@@ -4,6 +4,8 @@ import java.util.stream.Collectors;
 
 public class University implements Serializable {
     private List<Student> students;
+    private Curriculum curriculum = new Curriculum();
+
 
     public University() {
         this.students = new ArrayList<>();
@@ -45,10 +47,31 @@ public class University implements Serializable {
 
     public void graduateStudent(int fn) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
-            student.setStatus(Student.Status.GRADUATED);
-            System.out.println("Студентът е завършил.");
+            if (student.getStatus() != Student.Status.ACTIVE) {
+                System.out.println("Само активни студенти могат да се дипломират.");
+                return;
+            }
+
+            boolean allPassed = true;
+
+            for (String course : student.getEnrolledCourses()) {
+                Double grade = student.getGrades().get(course);
+                if (grade == null || grade < 3.0) {
+                    allPassed = false;
+                    System.out.println("Невзет или неположен изпит по: " + course);
+                }
+            }
+
+            if (allPassed) {
+                student.setStatus(Student.Status.GRADUATED);
+                System.out.println("Студентът е успешно дипломиран.");
+            } else {
+                System.out.println("Студентът НЕ може да се дипломира.");
+            }
+
         }, () -> System.out.println("Няма такъв студент."));
     }
+
 
     public void interruptStudent(int fn) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
@@ -68,12 +91,23 @@ public class University implements Serializable {
         }, () -> System.out.println("Няма такъв студент."));
     }
 
-    public void enrollInCourse(int fn, String course) {
+    public void enrollInCourse(int fn, String courseName) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
-            student.enrollInCourse(course);
+            if (student.getStatus() != Student.Status.ACTIVE) {
+                System.out.println("Студентът не е активен.");
+                return;
+            }
+
+            if (!curriculum.courseExistsFor(student.getProgram(), student.getYear(), courseName)) {
+                System.out.println("Тази дисциплина не е част от учебния план на специалността и курса.");
+                return;
+            }
+
+            student.enrollInCourse(courseName);
             System.out.println("Записан е по дисциплината.");
         }, () -> System.out.println("Няма такъв студент."));
     }
+
 
     public void addGrade(int fn, String course, double grade) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
@@ -88,11 +122,39 @@ public class University implements Serializable {
 
     public void printStudentReport(int fn) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
-            System.out.println(student);
-            student.getGrades().forEach((course, grade) ->
-                    System.out.println(" - " + course + ": " + grade));
+            System.out.println("\n" + student);
+
+            List<String> passed = new ArrayList<>();
+            List<String> failedOrMissing = new ArrayList<>();
+            double total = 0;
+            int count = 0;
+
+            for (String course : student.getEnrolledCourses()) {
+                Double grade = student.getGrades().get(course);
+
+                if (grade != null && grade >= 3.0) {
+                    passed.add(course + " - " + grade);
+                    total += grade;
+                } else {
+                    failedOrMissing.add(course + " - " + (grade == null ? "Няма оценка" : grade));
+                    total += 2.0;
+                }
+
+                count++;
+            }
+
+            System.out.println("\n Взети изпити:");
+            passed.forEach(c -> System.out.println("  - " + c));
+
+            System.out.println("\n Невзети/неположени изпити:");
+            failedOrMissing.forEach(c -> System.out.println("  - " + c));
+
+            double average = count > 0 ? total / count : 0;
+            System.out.printf("\n Среден успех: %.2f%n\n", average);
+
         }, () -> System.out.println("Няма такъв студент."));
     }
+
 
     public void printAllStudents(String program, int year) {
         List<Student> filtered = students.stream()
@@ -121,6 +183,22 @@ public class University implements Serializable {
         System.out.println("Протокол за дисциплина: " + course);
         list.forEach(s -> System.out.println(s.getFacultyNumber() + " - " + s.getName()));
     }
+    public void printAllCourses(String program) {
+        Map<Integer, List<Course>> allCourses = curriculum.getCourseMapForProgram(program);
+
+        if (allCourses.isEmpty()) {
+            System.out.println("Няма намерени дисциплини за тази специалност.");
+            return;
+        }
+
+        allCourses.keySet().stream().sorted().forEach(year -> {
+            System.out.println("Курс " + year + ":");
+            allCourses.get(year).forEach(c ->
+                    System.out.println(" - " + c.getName() + " (" + c.getType() + ")")
+            );
+        });
+    }
+
 
     public Optional<Student> findStudentByFacultyNumber(int fn) {
         return students.stream().filter(s -> s.getFacultyNumber() == fn).findFirst();
