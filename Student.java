@@ -2,7 +2,6 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Student implements Serializable {
-    private static final long serialVersionUID = 1L;
 
     private String name;
     private int facultyNumber;
@@ -38,10 +37,6 @@ public class Student implements Serializable {
 
     public String getProgram() {
         return program;
-    }
-
-    public String getGroup() {
-        return group;
     }
 
     public int getYear() {
