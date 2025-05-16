@@ -1,16 +1,30 @@
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-
+/**
+ * Основен клас за управление на университетската информационна система.
+ * Съдържа списък със студенти и учебен план.
+ */
 public class University implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private List<Student> students;
     private Curriculum curriculum = new Curriculum();
 
-
+    /**
+     * Конструктор по подразбиране.
+     */
     public University() {
         this.students = new ArrayList<>();
     }
-
+    /**
+     * Записва нов студент.
+     *
+     * @param name   името на студента
+     * @param fn     факултетен номер
+     * @param program специалност
+     * @param group  група
+     */
     public void enrollStudent(String name, int fn, String program, String group) {
         if (findStudentByFacultyNumber(fn).isPresent()) {
             System.out.println("Студент с този факултетен номер вече съществува.");
@@ -19,7 +33,11 @@ public class University implements Serializable {
         students.add(new Student(name, fn, program, group));
         System.out.println("Студентът е записан успешно.");
     }
-
+    /**
+     * Повишава студент в следващ курс.
+     *
+     * @param fn факултетен номер
+     */
     public void advanceStudent(int fn) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
             if (student.getStatus() != Student.Status.ACTIVE) {
@@ -30,7 +48,12 @@ public class University implements Serializable {
             System.out.println("Студентът е преминал в курс " + student.getYear() + ".");
         }, () -> System.out.println("Няма такъв студент."));
     }
-
+    /**
+     * Сменя специалността на студент.
+     *
+     * @param fn         факултетен номер
+     * @param newProgram нова специалност
+     */
     public void changeStudentProgram(int fn, String newProgram) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
             student.setStatus(Student.Status.ACTIVE); // автоматично активиране
@@ -44,7 +67,11 @@ public class University implements Serializable {
             System.out.println("Програмата е сменена успешно.");
         }, () -> System.out.println("Няма такъв студент."));
     }
-
+    /**
+     * Дипломира студент, ако всички изпити са положени.
+     *
+     * @param fn факултетен номер
+     */
     public void graduateStudent(int fn) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
             if (student.getStatus() != Student.Status.ACTIVE) {
@@ -72,14 +99,22 @@ public class University implements Serializable {
         }, () -> System.out.println("Няма такъв студент."));
     }
 
-
+    /**
+     * Прекъсва обучението на студент.
+     *
+     * @param fn факултетен номер
+     */
     public void interruptStudent(int fn) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
             student.setStatus(Student.Status.INTERRUPTED);
             System.out.println("Обучението е прекъснато.");
         }, () -> System.out.println("Няма такъв студент."));
     }
-
+    /**
+     * Възстановява студент след прекъсване.
+     *
+     * @param fn факултетен номер
+     */
     public void resumeStudent(int fn) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
             if (student.getStatus() != Student.Status.INTERRUPTED) {
@@ -90,7 +125,12 @@ public class University implements Serializable {
             System.out.println("Студентът е възстановен.");
         }, () -> System.out.println("Няма такъв студент."));
     }
-
+    /**
+     * Записва студент по дадена дисциплина.
+     *
+     * @param fn         факултетен номер
+     * @param courseName име на дисциплината
+     */
     public void enrollInCourse(int fn, String courseName) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
             if (student.getStatus() != Student.Status.ACTIVE) {
@@ -108,7 +148,13 @@ public class University implements Serializable {
         }, () -> System.out.println("Няма такъв студент."));
     }
 
-
+    /**
+     * Добавя оценка по дисциплина за студент.
+     *
+     * @param fn     факултетен номер
+     * @param course име на дисциплина
+     * @param grade  оценка
+     */
     public void addGrade(int fn, String course, double grade) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
             if (!student.isEnrolledIn(course)) {
@@ -119,7 +165,11 @@ public class University implements Serializable {
             System.out.println("Оценката е добавена.");
         }, () -> System.out.println("Няма такъв студент."));
     }
-
+    /**
+     * Извежда академичен отчет за студент.
+     *
+     * @param fn факултетен номер
+     */
     public void printStudentReport(int fn) {
         findStudentByFacultyNumber(fn).ifPresentOrElse(student -> {
             System.out.println("\n" + student);
@@ -155,7 +205,9 @@ public class University implements Serializable {
         }, () -> System.out.println("Няма такъв студент."));
     }
 
-
+    /**
+     * Извежда списък на всички студенти.
+     */
     public void printAllStudents(String program, int year) {
         List<Student> filtered = students.stream()
                 .filter(s -> (program == null || s.getProgram().equalsIgnoreCase(program)) &&
@@ -169,8 +221,14 @@ public class University implements Serializable {
 
         filtered.forEach(System.out::println);
     }
-
-    public void generateProtocol(String course) {
+    /**
+     * Генерира протокол по дисциплина за дадена група и курс.
+     *
+     * @param course име на дисциплината
+     * @param year   курс
+     * @param group  име на групата
+     */
+    public void generateProtocol(String course,int year,String group ) {
         List<Student> list = students.stream()
                 .filter(s -> s.isEnrolledIn(course))
                 .collect(Collectors.toList());
@@ -183,7 +241,14 @@ public class University implements Serializable {
         System.out.println("Протокол за дисциплина: " + course);
         list.forEach(s -> System.out.println(s.getFacultyNumber() + " - " + s.getName()));
     }
-    public void printAllCourses(String program) {
+
+    /**
+     * Извежда всички дисциплини за дадена специалност и курс от учебния план.
+     *
+     * @param program специалност
+     * @param year    курс
+     */
+    public void printAllCourses(String program, int year) {
         Map<Integer, List<Course>> allCourses = curriculum.getCourseMapForProgram(program);
 
         if (allCourses.isEmpty()) {
@@ -191,19 +256,30 @@ public class University implements Serializable {
             return;
         }
 
-        allCourses.keySet().stream().sorted().forEach(year -> {
-            System.out.println("Курс " + year + ":");
-            allCourses.get(year).forEach(c ->
+        allCourses.keySet().stream().sorted().forEach(y -> {
+            System.out.println("Курс " + y + ":");
+            allCourses.get(y).forEach(c ->
                     System.out.println(" - " + c.getName() + " (" + c.getType() + ")")
             );
         });
     }
 
-
+    /**
+     * Намира студент по факултетен номер.
+     *
+     * @param fn факултетен номер
+     * @return Optional със студент, ако бъде намерен
+     */
     public Optional<Student> findStudentByFacultyNumber(int fn) {
-        return students.stream().filter(s -> s.getFacultyNumber() == fn).findFirst();
+        return students.stream()
+                .filter(s -> s.getFacultyNumber() == fn)
+                .findFirst();
     }
-
+    /**
+     * Връща списък с всички записани студенти.
+     *
+     * @return списък със студенти
+     */
     public List<Student> getStudents() {
         return students;
     }
